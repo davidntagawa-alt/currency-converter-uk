@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Convertisseur de devises</title>
+<link rel="manifest" id="manifest-link">
+<meta name="theme-color" content="#0E7C66">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  --bg:#F5F6F4;
+  --surface:#FFFFFF;
+  --surface-2:#EEF1EF;
+  --border:#DEE3E0;
+  --ink:#10201C;
+  --ink-soft:#5B6A65;
+  --accent:#0E7C66;
+  --accent-ink:#FFFFFF;
+  --accent-soft:#DCEEE9;
+  --gold:#B8860B;
+  --danger:#B23A2E;
+  --danger-soft:#F6E4E1;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:9px;
+  --shadow:0 1px 2px rgba(16,32,28,0.06), 0 8px 24px rgba(16,32,28,0.06);
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --bg:#0D1613;
+    --surface:#152521;
+    --surface-2:#1C302B;
+    --border:#263B35;
+    --ink:#EFF5F2;
+    --ink-soft:#9AACA5;
+    --accent:#3FBFA0;
+    --accent-ink:#04211B;
+    --accent-soft:#1C3B33;
+    --gold:#E0B84A;
+    --danger:#E08276;
+    --danger-soft:#3A2320;
+    --shadow:0 1px 2px rgba(0,0,0,0.3), 0 8px 30px rgba(0,0,0,0.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1613;
+  --surface:#152521;
+  --surface-2:#1C302B;
+  --border:#263B35;
+  --ink:#EFF5F2;
+  --ink-soft:#9AACA5;
+  --accent:#3FBFA0;
+  --accent-ink:#04211B;
+  --accent-soft:#1C3B33;
+  --gold:#E0B84A;
+  --danger:#E08276;
+  --danger-soft:#3A2320;
+  --shadow:0 1px 2px rgba(0,0,0,0.3), 0 8px 30px rgba(0,0,0,0.35);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100%;
+}
+h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
+button{font-family:inherit;}
+.wrap{
+  max-width:560px;
+  margin:0 auto;
+  padding:20px 16px 60px;
+}
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:18px;
+  padding-top:env(safe-area-inset-top,0px);
+}
+.brand{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+}
+.brand .mark{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:700;
+  font-size:20px;
+  color:var(--ink);
+}
+.brand .sub{
+  font-size:12px;
+  color:var(--ink-soft);
+}
+.iconbtn{
+  width:38px;height:38px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  font-size:16px;
+  transition:transform .15s ease, background .15s ease;
+}
+.iconbtn:active{transform:scale(0.92);}
+.topbar-actions{display:flex;gap:8px;}
+
+.status-banner{
+  display:none;
+  align-items:center;
+  gap:8px;
+  font-size:12.5px;
+  padding:9px 12px;
+  border-radius:var(--radius-sm);
+  margin-bottom:14px;
+  background:var(--danger-soft);
+  color:var(--danger);
+  border:1px solid var(--danger);
+}
+.status-banner.show{display:flex;}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow);
+  padding:20px;
+}
+
+.field-label{
+  font-size:12px;
+  color:var(--ink-soft);
+  margin-bottom:8px;
+  display:block;
+}
+.amount-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+.amount-input{
+  flex:1;
+  border:none;
+  background:transparent;
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:600;
+  font-size:34px;
+  color:var(--ink);
+  width:100%;
+  min-width:0;
+  outline:none;
+}
+.amount-input::-webkit-outer-spin-button,
+.amount-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.amount-input[type=number]{-moz-appearance:textfield;}
+
+.currency-block{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.currency-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.currency-pill{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:9px 14px 9px 10px;
+  cursor:pointer;
+  transition:background .15s ease;
+}
+.currency-pill:hover{background:var(--accent-soft);}
+.currency-pill .flag{font-size:20px;line-height:1;}
+.currency-pill .code{font-weight:700;font-size:15px;letter-spacing:.02em;}
+.currency-pill .chev{color:var(--ink-soft);font-size:11px;margin-left:2px;}
+
+.swap-row{
+  display:flex;
+  align-items:center;
+  margin:8px 0;
+  position:relative;
+}
+.swap-row::before{
+  content:"";
+  position:absolute;
+  left:0;right:0;top:50%;
+  height:1px;
+  background:var(--border);
+}
+.swap-btn{
+  position:relative;
+  z-index:1;
+  margin:0 auto;
+  width:42px;height:42px;
+  border-radius:50%;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--accent);
+  font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+  transition:transform .2s ease;
+}
+.swap-btn:active{transform:rotate(180deg);}
+
+.result-box{
+  margin-top:16px;
+  padding-top:16px;
+  border-top:1px dashed var(--border);
+}
+.result-value{
+  font-family:'Space Grotesk',sans-serif;
+  font-weight:700;
+  font-size:40px;
+  color:var(--accent);
+  word-break:break-word;
+  line-height:1.15;
+}
+.result-sub{
+  font-size:13px;
+  color:var(--ink-soft);
+  margin-top:6px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.rate-line{
+  font-size:12.5px;
+  color:var(--ink-soft);
+  margin-top:2px;
+}
+.precision-toggle{
+  background:none;border:none;
+  color:var(--accent);
+  font-size:12.5px;
+  cursor:pointer;
+  padding:0;
+  text-decoration:underline;
+  text-underline-offset:2px;
+}
+
+.meta-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:16px;
+  font-size:11.5px;
+  color:var(--ink-soft);
+}
+.meta-row .refresh-btn{
+  display:flex;align-items:center;gap:5px;
+  background:none;border:none;color:var(--ink-soft);
+  cursor:pointer;font-size:11.5px;
+}
+.meta-row .refresh-btn svg{width:13px;height:13px;}
+.meta-row .refresh-btn.spinning svg{animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.section{margin-top:26px;}
+.section-title{
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--ink);
+  margin:0 0 10px 2px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.section-title .link-btn{
+  font-size:12px;
+  font-weight:500;
+  color:var(--ink-soft);
+  background:none;border:none;cursor:pointer;
+}
+
+.chip-row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.chip{
+  display:flex;align-items:center;gap:6px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:7px 12px;
+  font-size:13px;
+  cursor:pointer;
+}
+.chip .flag{font-size:15px;}
+.chip.empty{color:var(--ink-soft);border-style:dashed;}
+
+.hist-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:11px 14px;
+  margin-bottom:8px;
+  cursor:pointer;
+  font-size:13.5px;
+}
+.hist-item:hover{background:var(--surface-2);}
+.hist-left{display:flex;flex-direction:column;gap:2px;}
+.hist-main{font-weight:600;}
+.hist-time{font-size:11px;color:var(--ink-soft);}
+.hist-empty{
+  font-size:13px;color:var(--ink-soft);
+  padding:14px;text-align:center;
+  border:1px dashed var(--border);
+  border-radius:var(--radius-md);
+}
+
+.chart-card{padding:16px;}
+.period-row{display:flex;gap:6px;margin-bottom:12px;}
+.period-btn{
+  flex:1;
+  padding:7px 0;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--surface-2);
+  color:var(--ink-soft);
+  font-size:12.5px;
+  cursor:pointer;
+}
+.period-btn.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:var(--accent-ink);
+  font-weight:600;
+}
+.chart-svg{width:100%;height:140px;display:block;}
+.chart-empty{font-size:12.5px;color:var(--ink-soft);text-align:center;padding:20px 10px;}
+.chart-caption{font-size:11.5px;color:var(--ink-soft);margin-top:8px;text-align:center;}
+
+/* Currency picker sheet */
+.sheet-overlay{
+  position:fixed;inset:0;
+  background:rgba(8,15,13,0.5);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:50;
+}
+.sheet-overlay.show{display:flex;}
+.sheet{
+  background:var(--surface);
+  width:100%;
+  max-width:560px;
+  max-height:82vh;
+  border-radius:22px 22px 0 0;
+  padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));
+  display:flex;
+  flex-direction:column;
+  animation:sheetup .22s ease;
+}
+@keyframes sheetup{from{transform:translateY(24px);opacity:.6;}to{transform:translateY(0);opacity:1;}}
+.sheet-handle{
+  width:36px;height:4px;background:var(--border);
+  border-radius:99px;margin:0 auto 10px;
+}
+.sheet-title{font-size:15px;font-weight:700;margin-bottom:10px;}
+.search-box{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  border-radius:var(--radius-md);
+  padding:10px 12px;
+  margin-bottom:10px;
+}
+.search-box input{
+  border:none;background:transparent;outline:none;
+  color:var(--ink);font-size:14.5px;width:100%;
+}
+.currency-list{
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.currency-list-group-title{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+  color:var(--ink-soft);
+  padding:10px 6px 6px;
+}
+.currency-list-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 6px;
+  border-radius:var(--radius-sm);
+  cursor:pointer;
+}
+.currency-list-item:hover{background:var(--surface-2);}
+.currency-list-item .flag{font-size:22px;}
+.currency-list-item .names{flex:1;min-width:0;}
+.currency-list-item .code2{font-weight:700;font-size:14px;}
+.currency-list-item .name2{font-size:12px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.currency-list-item .star{
+  background:none;border:none;font-size:17px;cursor:pointer;
+  color:var(--border);
+  padding:4px;
+}
+.currency-list-item .star.active{color:var(--gold);}
+
+footer.app-footer{
+  text-align:center;
+  color:var(--ink-soft);
+  font-size:11px;
+  margin-top:30px;
+  line-height:1.6;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <span class="mark" id="brandTitle">Kobo</span>
+      <span class="sub" id="brandSub">Taux de change en direct</span>
+    </div>
+    <div class="topbar-actions">
+      <button class="iconbtn" id="langBtn" title="Langue">FR</button>
+      <button class="iconbtn" id="themeBtn" title="Thème">🌙</button>
+    </div>
+  </div>
+
+  <div class="status-banner" id="statusBanner">
+    <span>⚠️</span><span id="statusBannerText"></span>
+  </div>
+
+  <div class="card">
+    <label class="field-label" id="lblAmount">Montant</label>
+    <div class="amount-row">
+      <input type="number" inputmode="decimal" class="amount-input" id="amountInput" value="100" min="0">
+      <div class="currency-pill" id="fromPill">
+        <span class="flag" id="fromFlag">🇺🇸</span>
+        <span class="code" id="fromCode">USD</span>
+        <span class="chev">▾</span>
+      </div>
+    </div>
+
+    <div class="swap-row">
+      <button class="swap-btn" id="swapBtn" title="Inverser les devises">⇅</button>
+    </div>
+
+    <div class="currency-row" style="margin-top:6px;">
+      <label class="field-label" id="lblTo" style="margin:0;">Vers</label>
+      <div class="currency-pill" id="toPill">
+        <span class="flag" id="toFlag">🇷🇼</span>
+        <span class="code" id="toCode">RWF</span>
+        <span class="chev">▾</span>
+      </div>
+    </div>
+
+    <div class="result-box">
+      <label class="field-label" id="lblResult">Résultat</label>
+      <div class="result-value" id="resultValue">—</div>
+      <div class="result-sub">
+        <span id="rateLine"></span>
+      </div>
+      <div class="result-sub">
+        <button class="precision-toggle" id="precisionToggle">Afficher plus de décimales</button>
+      </div>
+    </div>
+
+    <div class="meta-row">
+      <span id="lastUpdateLine">—</span>
+      <button class="refresh-btn" id="refreshBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg>
+        <span id="refreshLabel">Actualiser</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      <span id="favTitle">⭐ Favoris</span>
+    </div>
+    <div class="chip-row" id="favRow"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      <span id="histTitle">🕘 Historique récent</span>
+      <button class="link-btn" id="clearHistBtn">Effacer</button>
+    </div>
+    <div id="histList"></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title"><span id="chartTitle">📊 Évolution du taux</span></div>
+    <div class="card chart-card">
+      <div class="period-row" id="periodRow">
+        <button class="period-btn" data-period="7">7 j</button>
+        <button class="period-btn active" data-period="30">30 j</button>
+        <button class="period-btn" data-period="90">90 j</button>
+        <button class="period-btn" data-period="365">1 an</button>
+      </div>
+      <div id="chartContainer">
+        <div class="chart-empty" id="chartEmpty">Chargement du graphique…</div>
+      </div>
+      <div class="chart-caption" id="chartCaption"></div>
+    </div>
+  </div>
+
+  <footer class="app-footer" id="footerNote">
+    Taux fournis par open.er-api.com (Open Exchange Rates), mise à jour quotidienne.<br>
+    Historique fourni par Frankfurter.app (Banque centrale européenne).
+  </footer>
+</div>
+
+<!-- Currency picker sheet -->
+<div class="sheet-overlay" id="sheetOverlay">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="sheetTitle">Choisir une devise</div>
+    <div class="search-box">
+      <span>🔎</span>
+      <input type="text" id="searchInput" placeholder="Rechercher un nom, un code…">
+    </div>
+    <div class="currency-list" id="currencyListEl"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------------------------------------------------------
+   1) CURRENCY METADATA (ISO 4217, names in FR/EN, symbol, country code for flag)
+--------------------------------------------------------- */
+const RAW = [
+["USD","Dollar américain","US Dollar","$","US"],
+["EUR","Euro","Euro","€","EU"],
+["GBP","Livre sterling","British Pound","£","GB"],
+["JPY","Yen japonais","Japanese Yen","¥","JP"],
+["CHF","Franc suisse","Swiss Franc","CHF","CH"],
+["CAD","Dollar canadien","Canadian Dollar","$","CA"],
+["AUD","Dollar australien","Australian Dollar","$","AU"],
+["NZD","Dollar néo-zélandais","New Zealand Dollar","$","NZ"],
+["CNY","Yuan chinois","Chinese Yuan","¥","CN"],
+["HKD","Dollar de Hong Kong","Hong Kong Dollar","$","HK"],
+["SGD","Dollar de Singapour","Singapore Dollar","$","SG"],
+["INR","Roupie indienne","Indian Rupee","₹","IN"],
+["KRW","Won sud-coréen","South Korean Won","₩","KR"],
+["MXN","Peso mexicain","Mexican Peso","$","MX"],
+["BRL","Real brésilien","Brazilian Real","R$","BR"],
+["ZAR","Rand sud-africain","South African Rand","R","ZA"],
+["RUB","Rouble russe","Russian Ruble","₽","RU"],
+["TRY","Livre turque","Turkish Lira","₺","TR"],
+["SEK","Couronne suédoise","Swedish Krona","kr","SE"],
+["NOK","Couronne norvégienne","Norwegian Krone","kr","NO"],
+["DKK","Couronne danoise","Danish Krone","kr","DK"],
+["PLN","Zloty polonais","Polish Zloty","zł","PL"],
+["CZK","Couronne tchèque","Czech Koruna","Kč","CZ"],
+["HUF","Forint hongrois","Hungarian Forint","Ft","HU"],
+["RON","Leu roumain","Romanian Leu","lei","RO"],
+["BGN","Lev bulgare","Bulgarian Lev","лв","BG"],
+["ISK","Couronne islandaise","Icelandic Krona","kr","IS"],
+["ILS","Nouveau shekel israélien","Israeli Shekel","₪","IL"],
+["AED","Dirham des Émirats arabes unis","UAE Dirham","د.إ","AE"],
+["SAR","Riyal saoudien","Saudi Riyal","﷼","SA"],
+["QAR","Riyal qatari","Qatari Riyal","﷼","QA"],
+["KWD","Dinar koweïtien","Kuwaiti Dinar","د.ك","KW"],
+["BHD","Dinar bahreïni","Bahraini Dinar",".د.ب","BH"],
+["OMR","Rial omanais","Omani Rial","﷼","OM"],
+["JOD","Dinar jordanien","Jordanian Dinar","د.ا","JO"],
+["EGP","Livre égyptienne","Egyptian Pound","£","EG"],
+["MAD","Dirham marocain","Moroccan Dirham","د.م.","MA"],
+["TND","Dinar tunisien","Tunisian Dinar","د.ت","TN"],
+["DZD","Dinar algérien","Algerian Dinar","د.ج","DZ"],
+["NGN","Naira nigérian","Nigerian Naira","₦","NG"],
+["GHS","Cedi ghanéen","Ghanaian Cedi","₵","GH"],
+["KES","Shilling kényan","Kenyan Shilling","Sh","KE"],
+["TZS","Shilling tanzanien","Tanzanian Shilling","Sh","TZ"],
+["UGX","Shilling ougandais","Ugandan Shilling","Sh","UG"],
+["RWF","Franc rwandais","Rwandan Franc","FRw","RW"],
+["BIF","Franc burundais","Burundian Franc","FBu","BI"],
+["ETB","Birr éthiopien","Ethiopian Birr","Br","ET"],
+["XOF","Franc CFA (UEMOA)","West African CFA Franc","CFA","SN"],
+["XAF","Franc CFA (CEMAC)","Central African CFA Franc","FCFA","CM"],
+["CDF","Franc congolais","Congolese Franc","FC","CD"],
+["ZMW","Kwacha zambien","Zambian Kwacha","ZK","ZM"],
+["MZN","Metical mozambicain","Mozambican Metical","MT","MZ"],
+["AOA","Kwanza angolais","Angolan Kwanza","Kz","AO"],
+["NAD","Dollar namibien","Namibian Dollar","$","NA"],
+["BWP","Pula botswanais","Botswana Pula","P","BW"],
+["MUR","Roupie mauricienne","Mauritian Rupee","₨","MU"],
+["XPF","Franc CFP","CFP Franc","₣","PF"],
+["THB","Baht thaïlandais","Thai Baht","฿","TH"],
+["VND","Dong vietnamien","Vietnamese Dong","₫","VN"],
+["IDR","Roupie indonésienne","Indonesian Rupiah","Rp","ID"],
+["MYR","Ringgit malaisien","Malaysian Ringgit","RM","MY"],
+["PHP","Peso philippin","Philippine Peso","₱","PH"],
+["PKR","Roupie pakistanaise","Pakistani Rupee","₨","PK"],
+["BDT","Taka bangladais","Bangladeshi Taka","৳","BD"],
+["LKR","Roupie srilankaise","Sri Lankan Rupee","₨","LK"],
+["NPR","Roupie népalaise","Nepalese Rupee","₨","NP"],
+["MMK","Kyat birman","Myanmar Kyat","K","MM"],
+["KHR","Riel cambodgien","Cambodian Riel","៛","KH"],
+["LAK","Kip laotien","Lao Kip","₭","LA"],
+["MNT","Tugrik mongol","Mongolian Tugrik","₮","MN"],
+["KZT","Tenge kazakh","Kazakhstani Tenge","₸","KZ"],
+["UZS","Som ouzbek","Uzbekistani Som","so'm","UZ"],
+["AZN","Manat azerbaïdjanais","Azerbaijani Manat","₼","AZ"],
+["GEL","Lari géorgien","Georgian Lari","₾","GE"],
+["AMD","Dram arménien","Armenian Dram","֏","AM"],
+["UAH","Hryvnia ukrainienne","Ukrainian Hryvnia","₴","UA"],
+["BYN","Rouble biélorusse","Belarusian Ruble","Br","BY"],
+["RSD","Dinar serbe","Serbian Dinar","дин.","RS"],
+["ALL","Lek albanais","Albanian Lek","L","AL"],
+["MKD","Denar macédonien","Macedonian Denar","ден","MK"],
+["BAM","Mark convertible","Bosnia Convertible Mark","KM","BA"],
+["MDL","Leu moldave","Moldovan Leu","L","MD"],
+["ARS","Peso argentin","Argentine Peso","$","AR"],
+["CLP","Peso chilien","Chilean Peso","$","CL"],
+["COP","Peso colombien","Colombian Peso","$","CO"],
+["PEN","Sol péruvien","Peruvian Sol","S/","PE"],
+["UYU","Peso uruguayen","Uruguayan Peso","$","UY"],
+["BOB","Boliviano","Bolivian Boliviano","Bs.","BO"],
+["PYG","Guarani paraguayen","Paraguayan Guarani","₲","PY"],
+["VES","Bolivar vénézuélien","Venezuelan Bolivar","Bs.","VE"],
+["CRC","Colón costaricien","Costa Rican Colón","₡","CR"],
+["GTQ","Quetzal guatémaltèque","Guatemalan Quetzal","Q","GT"],
+["HNL","Lempira hondurien","Honduran Lempira","L","HN"],
+["NIO","Cordoba nicaraguayen","Nicaraguan Córdoba","C$","NI"],
+["DOP","Peso dominicain","Dominican Peso","RD$","DO"],
+["JMD","Dollar jamaïcain","Jamaican Dollar","$","JM"],
+["TTD","Dollar de Trinité-et-Tobago","Trinidad Dollar","$","TT"],
+["BSD","Dollar bahaméen","Bahamian Dollar","$","BS"],
+["BBD","Dollar barbadien","Barbadian Dollar","$","BB"],
+["XCD","Dollar est-caribéen","East Caribbean Dollar","$","AG"],
+["FJD","Dollar fidjien","Fijian Dollar","$","FJ"],
+["PGK","Kina papouasien","Papua New Guinean Kina","K","PG"],
+["WST","Tala samoan","Samoan Tala","T","WS"],
+["TOP","Pa'anga tongan","Tongan Paʻanga","T$","TO"],
+["TWD","Nouveau dollar taïwanais","New Taiwan Dollar","NT$","TW"],
+["BND","Dollar de Brunei","Brunei Dollar","$","BN"],
+["IQD","Dinar irakien","Iraqi Dinar","ع.د","IQ"],
+["IRR","Rial iranien","Iranian Rial","﷼","IR"],
+["LBP","Livre libanaise","Lebanese Pound","ل.ل","LB"],
+["SYP","Livre syrienne","Syrian Pound","£","SY"],
+["YER","Rial yéménite","Yemeni Rial","﷼","YE"],
+["AFN","Afghani","Afghan Afghani","؋","AF"],
+["LYD","Dinar libyen","Libyan Dinar","ل.د","LY"],
+["SDG","Livre soudanaise","Sudanese Pound","ج.س.","SD"],
+["SSP","Livre sud-soudanaise","South Sudanese Pound","£","SS"],
+["SOS","Shilling somalien","Somali Shilling","Sh","SO"],
+["DJF","Franc djiboutien","Djiboutian Franc","Fdj","DJ"],
+["ERN","Nakfa érythréen","Eritrean Nakfa","Nfk","ER"],
+["GMD","Dalasi gambien","Gambian Dalasi","D","GM"],
+["GNF","Franc guinéen","Guinean Franc","FG","GN"],
+["LRD","Dollar libérien","Liberian Dollar","$","LR"],
+["SLE","Leone sierra-léonais","Sierra Leonean Leone","Le","SL"],
+["CVE","Escudo cap-verdien","Cape Verdean Escudo","$","CV"],
+["STN","Dobra santoméen","São Tomé Dobra","Db","ST"],
+["KMF","Franc comorien","Comorian Franc","CF","KM"],
+["MGA","Ariary malgache","Malagasy Ariary","Ar","MG"],
+["MWK","Kwacha malawite","Malawian Kwacha","MK","MW"],
+["SZL","Lilangeni swazi","Swazi Lilangeni","L","SZ"],
+["LSL","Loti lesothan","Lesotho Loti","L","LS"],
+["SCR","Roupie seychelloise","Seychellois Rupee","₨","SC"],
+["FKP","Livre des Malouines","Falkland Pound","£","FK"],
+["GIP","Livre de Gibraltar","Gibraltar Pound","£","GI"],
+["SHP","Livre de Sainte-Hélène","Saint Helena Pound","£","SH"],
+["BZD","Dollar bélizien","Belize Dollar","$","BZ"],
+["SRD","Dollar surinamien","Surinamese Dollar","$","SR"],
+["GYD","Dollar guyanien","Guyanese Dollar","$","GY"],
+["ANG","Florin des Antilles néerlandaises","Netherlands Antillean Guilder","ƒ","CW"],
+["AWG","Florin arubais","Aruban Florin","ƒ","AW"],
+["BMD","Dollar bermudien","Bermudian Dollar","$","BM"],
+["KYD","Dollar caïmanais","Cayman Islands Dollar","$","KY"],
+["PAB","Balboa panaméen","Panamanian Balboa","B/.","PA"],
+["HTG","Gourde haïtienne","Haitian Gourde","G","HT"],
+["CUP","Peso cubain","Cuban Peso","$","CU"],
+["MOP","Pataca macanaise","Macanese Pataca","MOP$","MO"],
+["BTN","Ngultrum bhoutanais","Bhutanese Ngultrum","Nu.","BT"],
+["MVR","Rufiyaa maldivienne","Maldivian Rufiyaa","Rf","MV"],
+["TJS","Somoni tadjik","Tajikistani Somoni","SM","TJ"],
+["KGS","Som kirghize","Kyrgystani Som","с","KG"],
+["TMT","Manat turkmène","Turkmenistani Manat","m","TM"]
+];
+
+const FLAG_OVERRIDE = { XOF:"🌍", XAF:"🌍", XPF:"🌍" };
+
+function flagFromISO2(iso2){
+  if(!iso2) return "💱";
+  const cps = [...iso2.toUpperCase()].map(c => 127397 + c.charCodeAt(0));
+  return String.fromCodePoint(...cps);
+}
+
+const CURRENCIES = {};
+RAW.forEach(([code,nameFr,nameEn,symbol,iso2])=>{
+  CURRENCIES[code] = {
+    code, nameFr, nameEn, symbol,
+    flag: FLAG_OVERRIDE[code] || flagFromISO2(iso2)
+  };
+});
+
+// Currencies with 0 decimal places conventionally
+const ZERO_DECIMAL = new Set(["JPY","KRW","VND","CLP","ISK","HUF","TWD","XOF","XAF","XPF","RWF","UGX","GNF","PYG","KMF","DJF","VUV","MGA"]);
+const THREE_DECIMAL = new Set(["BHD","KWD","OMR","JOD","TND","LYD"]);
+
+function decimalsFor(code){
+  if(ZERO_DECIMAL.has(code)) return 0;
+  if(THREE_DECIMAL.has(code)) return 3;
+  return 2;
+}
+
+/* ---------------------------------------------------------
+   2) i18n
+--------------------------------------------------------- */
+const STRINGS = {
+  fr:{
+    brandSub:"Taux de change en direct",
+    lblAmount:"Montant", lblTo:"Vers", lblResult:"Résultat",
+    favTitle:"⭐ Favoris", histTitle:"🕘 Historique récent", chartTitle:"📊 Évolution du taux",
+    clear:"Effacer", refresh:"Actualiser", refreshing:"Actualisation…",
+    searchPlaceholder:"Rechercher un nom, un code…", chooseTitle:"Choisir une devise",
+    moreDecimals:"Afficher plus de décimales", fewerDecimals:"Afficher moins de décimales",
+    noHistory:"Aucune conversion pour l'instant.", noFav:"Ajoutez des favoris depuis le sélecteur ⭐",
+    updatedAt:"Mis à jour :", offline:"Hors ligne — dernier taux connu du",
+    errorFetch:"Impossible de récupérer les taux. Affichage des dernières données en cache.",
+    chartUnavailable:"Historique non disponible pour cette paire de devises.",
+    chartLoading:"Chargement du graphique…",
+    rateLine:(a,ca,b,cb)=>`1 ${ca} = ${b} ${cb}`,
+    chartCaption:(a,b)=>`Évolution de 1 ${a} en ${b}`,
+    yourFavs:"Vos devises favorites",
+    all:"Toutes les devises"
+  },
+  en:{
+    brandSub:"Live exchange rates",
+    lblAmount:"Amount", lblTo:"To", lblResult:"Result",
+    favTitle:"⭐ Favorites", histTitle:"🕘 Recent history", chartTitle:"📊 Rate history",
+    clear:"Clear", refresh:"Refresh", refreshing:"Refreshing…",
+    searchPlaceholder:"Search a name, a code…", chooseTitle:"Choose a currency",
+    moreDecimals:"Show more decimals", fewerDecimals:"Show fewer decimals",
+    noHistory:"No conversions yet.", noFav:"Add favorites from the picker ⭐",
+    updatedAt:"Updated:", offline:"Offline — last known rate from",
+    errorFetch:"Could not fetch live rates. Showing last cached data.",
+    chartUnavailable:"History unavailable for this currency pair.",
+    chartLoading:"Loading chart…",
+    rateLine:(a,ca,b,cb)=>`1 ${ca} = ${b} ${cb}`,
+    chartCaption:(a,b)=>`1 ${a} value in ${b} over time`,
+    yourFavs:"Your favorite currencies",
+    all:"All currencies"
+  }
+};
+let LANG = localStorage.getItem('cc_lang') || 'fr';
+function t(key){ return STRINGS[LANG][key]; }
+
+/* ---------------------------------------------------------
+   3) State
+--------------------------------------------------------- */
+let state = {
+  from: localStorage.getItem('cc_from') || 'USD',
+  to: localStorage.getItem('cc_to') || 'RWF',
+  amount: parseFloat(localStorage.getItem('cc_amount')) || 100,
+  extraPrecision: false,
+  rates: null,         // { base, date_str, timestamp, rates:{...} }
+  favorites: JSON.parse(localStorage.getItem('cc_favs') || '["USD","EUR","GBP","RWF"]'),
+  history: JSON.parse(localStorage.getItem('cc_history') || '[]'),
+  pickerTarget: null,   // 'from' | 'to'
+  chartPeriod: 30
+};
+
+/* ---------------------------------------------------------
+   4) API — open.er-api.com (no key, free, ~161 currencies, updated daily)
+--------------------------------------------------------- */
+const RATE_CACHE_TTL_MS = 30 * 60 * 1000; // 30 min: avoid hammering the API
+
+async function getRates(base, forceRefresh){
+  const cacheKey = 'cc_rates_' + base;
+  const cachedRaw = localStorage.getItem(cacheKey);
+  const cached = cachedRaw ? JSON.parse(cachedRaw) : null;
+
+  const isFresh = cached && (Date.now() - cached.fetchedAt) < RATE_CACHE_TTL_MS;
+  if(cached && isFresh && !forceRefresh){
+    return { data: cached, fromCache:true, stale:false };
+  }
+
+  try{
+    const res = await fetch(`https://open.er-api.com/v6/latest/${base}`);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const json = await res.json();
+    if(json.result !== 'success') throw new Error('API error');
+    const payload = {
+      base,
+      rates: json.rates,
+      time_last_update_utc: json.time_last_update_utc,
+      time_next_update_utc: json.time_next_update_utc,
+      fetchedAt: Date.now()
+    };
+    localStorage.setItem(cacheKey, JSON.stringify(payload));
+    return { data: payload, fromCache:false, stale:false };
+  }catch(err){
+    if(cached){
+      return { data: cached, fromCache:true, stale:true, error:err };
+    }
+    throw err;
+  }
+}
+
+/* ---------------------------------------------------------
+   5) Rendering helpers
+--------------------------------------------------------- */
+const $ = id => document.getElementById(id);
+
+function meta(code){
+  return CURRENCIES[code] || { code, nameFr:code, nameEn:code, symbol:code, flag:"💱" };
+}
+function currencyName(code){
+  const m = meta(code);
+  return LANG === 'fr' ? m.nameFr : m.nameEn;
+}
+
+function formatNumber(value, decimals){
+  if(!isFinite(value)) return "—";
+  const opts = { minimumFractionDigits: decimals, maximumFractionDigits: decimals };
+  return new Intl.NumberFormat(LANG === 'fr' ? 'fr-FR' : 'en-US', opts).format(value);
+}
+
+function renderStaticText(){
+  $('brandSub').textContent = t('brandSub');
+  $('lblAmount').textContent = t('lblAmount');
+  $('lblTo').textContent = t('lblTo');
+  $('lblResult').textContent = t('lblResult');
+  $('favTitle').textContent = t('favTitle');
+  $('histTitle').textContent = t('histTitle');
+  $('chartTitle').textContent = t('chartTitle');
+  $('clearHistBtn').textContent = t('clear');
+  $('refreshLabel').textContent = t('refresh');
+  $('searchInput').placeholder = t('searchPlaceholder');
+  $('sheetTitle').textContent = t('chooseTitle');
+  $('precisionToggle').textContent = state.extraPrecision ? t('fewerDecimals') : t('moreDecimals');
+  $('langBtn').textContent = LANG.toUpperCase();
+}
+
+function renderPills(){
+  const fm = meta(state.from), tm = meta(state.to);
+  $('fromFlag').textContent = fm.flag; $('fromCode').textContent = fm.code;
+  $('toFlag').textContent = tm.flag; $('toCode').textContent = tm.code;
+}
+
+function currentConversionRate(){
+  if(!state.rates) return null;
+  const r = state.rates.rates;
+  if(!r || !(state.from in r) || !(state.to in r)) return null;
+  // rates are relative to state.rates.base; convert from->to via base
+  const rFrom = r[state.from], rTo = r[state.to];
+  if(!rFrom) return null;
+  return rTo / rFrom;
+}
+
+function render(){
+  renderPills();
+  const rate = currentConversionRate();
+  const amount = state.amount || 0;
+  const dTo = state.extraPrecision ? 6 : decimalsFor(state.to);
+
+  if(rate == null){
+    $('resultValue').textContent = "—";
+    $('rateLine').textContent = "";
+  } else {
+    const result = amount * rate;
+    $('resultValue').textContent = meta(state.to).symbol + " " + formatNumber(result, dTo);
+    const dRate = state.extraPrecision ? 8 : 4;
+    $('rateLine').textContent = t('rateLine')(1, state.from, formatNumber(rate, dRate), state.to);
+  }
+
+  // last update line
+  if(state.rates){
+    const d = new Date(state.rates.time_last_update_utc || state.rates.fetchedAt);
+    const dateStr = isNaN(d) ? '' : d.toLocaleString(LANG === 'fr' ? 'fr-FR' : 'en-US', {dateStyle:'medium', timeStyle:'short'});
+    $('lastUpdateLine').textContent = (t('updatedAt') + ' ' + dateStr);
+  }
+
+  renderFavorites();
+  renderHistory();
+}
+
+function showBanner(msg){
+  $('statusBanner').classList.add('show');
+  $('statusBannerText').textContent = msg;
+}
+function hideBanner(){
+  $('statusBanner').classList.remove('show');
+}
+
+function renderFavorites(){
+  const row = $('favRow');
+  row.innerHTML = '';
+  if(state.favorites.length === 0){
+    const d = document.createElement('div');
+    d.className = 'chip empty';
+    d.textContent = t('noFav');
+    row.appendChild(d);
+    return;
+  }
+  state.favorites.forEach(code=>{
+    const m = meta(code);
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.innerHTML = `<span class="flag">${m.flag}</span><span>${m.code}</span>`;
+    chip.onclick = ()=>{ state.to = code; persist(); render(); loadRatesAndRender(); };
+    row.appendChild(chip);
+  });
+}
+
+function renderHistory(){
+  const list = $('histList');
+  list.innerHTML = '';
+  if(state.history.length === 0){
+    list.innerHTML = `<div class="hist-empty">${t('noHistory')}</div>`;
+    return;
+  }
+  state.history.slice(0,8).forEach(item=>{
+    const div = document.createElement('div');
+    div.className = 'hist-item';
+    const d = new Date(item.ts);
+    const timeStr = d.toLocaleString(LANG === 'fr' ? 'fr-FR' : 'en-US', {dateStyle:'short', timeStyle:'short'});
+    div.innerHTML = `
+      <div class="hist-left">
+        <span class="hist-main">${meta(item.from).flag} ${formatNumber(item.amount, decimalsFor(item.from))} ${item.from} → ${meta(item.to).flag} ${item.to}</span>
+        <span class="hist-time">${timeStr}</span>
+      </div>
+      <div style="font-weight:700;">${formatNumber(item.result, decimalsFor(item.to))}</div>
+    `;
+    div.onclick = ()=>{
+      state.from = item.from; state.to = item.to; state.amount = item.amount;
+      $('amountInput').value = item.amount;
+      persist(); render(); loadRatesAndRender();
+    };
+    list.appendChild(div);
+  });
+}
+
+function pushHistory(){
+  const rate = currentConversionRate();
+  if(rate == null || !state.amount) return;
+  const entry = { from:state.from, to:state.to, amount:state.amount, result: state.amount*rate, ts: Date.now() };
+  state.history = [entry, ...state.history.filter(h => !(h.from===entry.from && h.to===entry.to && h.amount===entry.amount))].slice(0,20);
+  localStorage.setItem('cc_history', JSON.stringify(state.history));
+}
+
+function persist(){
+  localStorage.setItem('cc_from', state.from);
+  localStorage.setItem('cc_to', state.to);
+  localStorage.setItem('cc_amount', String(state.amount));
+  localStorage.setItem('cc_favs', JSON.stringify(state.favorites));
+}
+
+/* ---------------------------------------------------------
+   6) Fetch orchestration
+--------------------------------------------------------- */
+let historyDebounceTimer = null;
+async function loadRatesAndRender(forceRefresh){
+  const btn = $('refreshBtn');
+  btn.classList.add('spinning');
+  try{
+    const { data, fromCache, stale } = await getRates(state.from, forceRefresh);
+    state.rates = data;
+    if(stale){
+      const d = new Date(data.time_last_update_utc || data.fetchedAt);
+      const dateStr = isNaN(d) ? '' : d.toLocaleString(LANG==='fr'?'fr-FR':'en-US',{dateStyle:'medium', timeStyle:'short'});
+      showBanner(t('offline') + ' ' + dateStr);
+    } else {
+      hideBanner();
+    }
+    render();
+    clearTimeout(historyDebounceTimer);
+    historyDebounceTimer = setTimeout(pushHistory, 1200);
+  }catch(err){
+    showBanner(t('errorFetch'));
+  }finally{
+    btn.classList.remove('spinning');
+  }
+}
+
+/* ---------------------------------------------------------
+   7) Currency picker sheet
+--------------------------------------------------------- */
+function openPicker(target){
+  state.pickerTarget = target;
+  $('sheetOverlay').classList.add('show');
+  $('searchInput').value = '';
+  renderCurrencyList('');
+  setTimeout(()=>$('searchInput').focus(), 50);
+}
+function closePicker(){
+  $('sheetOverlay').classList.remove('show');
+}
+
+function renderCurrencyList(query){
+  const el = $('currencyListEl');
+  el.innerHTML = '';
+  const q = query.trim().toLowerCase();
+
+  const all = Object.values(CURRENCIES);
+  const filtered = q === '' ? all : all.filter(c =>
+    c.code.toLowerCase().includes(q) ||
+    c.nameFr.toLowerCase().includes(q) ||
+    c.nameEn.toLowerCase().includes(q)
+  );
+
+  if(q === ''){
+    const favTitle = document.createElement('div');
+    favTitle.className = 'currency-list-group-title';
+    favTitle.textContent = t('yourFavs');
+    el.appendChild(favTitle);
+    state.favorites.forEach(code=>{
+      if(CURRENCIES[code]) el.appendChild(buildCurrencyRow(CURRENCIES[code]));
+    });
+    const allTitle = document.createElement('div');
+    allTitle.className = 'currency-list-group-title';
+    allTitle.textContent = t('all');
+    el.appendChild(allTitle);
+  }
+
+  filtered.forEach(c => el.appendChild(buildCurrencyRow(c)));
+}
+
+function buildCurrencyRow(c){
+  const row = document.createElement('div');
+  row.className = 'currency-list-item';
+  const isFav = state.favorites.includes(c.code);
+  row.innerHTML = `
+    <span class="flag">${c.flag}</span>
+    <div class="names">
+      <div class="code2">${c.code}</div>
+      <div class="name2">${LANG === 'fr' ? c.nameFr : c.nameEn}</div>
+    </div>
+    <button class="star ${isFav ? 'active' : ''}">★</button>
+  `;
+  row.querySelector('.names').onclick = ()=> selectCurrency(c.code);
+  row.querySelector('.flag').onclick = ()=> selectCurrency(c.code);
+  row.querySelector('.star').onclick = (e)=>{
+    e.stopPropagation();
+    toggleFavorite(c.code);
+    row.querySelector('.star').classList.toggle('active');
+  };
+  return row;
+}
+
+function toggleFavorite(code){
+  const i = state.favorites.indexOf(code);
+  if(i >= 0) state.favorites.splice(i,1);
+  else state.favorites.unshift(code);
+  state.favorites = state.favorites.slice(0,10);
+  persist();
+  renderFavorites();
+}
+
+function selectCurrency(code){
+  if(state.pickerTarget === 'from') state.from = code;
+  else state.to = code;
+  persist();
+  closePicker();
+  render();
+  loadRatesAndRender();
+  drawChart();
+}
+
+/* ---------------------------------------------------------
+   8) Historical chart — Frankfurter.app (ECB data, free, no key)
+--------------------------------------------------------- */
+async function drawChart(){
+  const container = $('chartContainer');
+  container.innerHTML = `<div class="chart-empty">${t('chartLoading')}</div>`;
+  $('chartCaption').textContent = '';
+
+  const days = state.chartPeriod;
+  const end = new Date();
+  const start = new Date(end.getTime() - days*24*60*60*1000);
+  const fmt = d => d.toISOString().slice(0,10);
+
+  try{
+    const url = `https://api.frankfurter.app/${fmt(start)}..${fmt(end)}?from=${state.from}&to=${state.to}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const json = await res.json();
+    const entries = Object.entries(json.rates || {}).sort((a,b)=> a[0].localeCompare(b[0]));
+    if(entries.length < 2) throw new Error('not enough data');
+    const values = entries.map(([date,obj]) => obj[state.to]);
+    renderChartSVG(values, entries.map(e=>e[0]));
+    $('chartCaption').textContent = t('chartCaption')(state.from, state.to);
+  }catch(err){
+    container.innerHTML = `<div class="chart-empty">${t('chartUnavailable')}</div>`;
+  }
+}
+
+function renderChartSVG(values, dates){
+  const container = $('chartContainer');
+  const w = 560, h = 140, pad = 10;
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = (max - min) || 1;
+  const stepX = (w - pad*2) / (values.length - 1);
+
+  const points = values.map((v,i)=>{
+    const x = pad + i*stepX;
+    const y = pad + (1 - (v - min)/range) * (h - pad*2);
+    return [x,y];
+  });
+
+  const linePath = points.map((p,i)=> (i===0?'M':'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  const areaPath = linePath + ` L${points[points.length-1][0].toFixed(1)},${h-pad} L${points[0][0].toFixed(1)},${h-pad} Z`;
+
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+
+  container.innerHTML = `
+    <svg class="chart-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${accent}" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="${accent}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${areaPath}" fill="url(#chartGrad)" stroke="none"/>
+      <path d="${linePath}" fill="none" stroke="${accent}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg>
+  `;
+}
+
+/* ---------------------------------------------------------
+   9) Theme + language
+--------------------------------------------------------- */
+function applyThemeButton(){
+  const stored = localStorage.getItem('cc_theme');
+  if(stored) document.documentElement.setAttribute('data-theme', stored);
+  const isDark = (document.documentElement.getAttribute('data-theme') === 'dark') ||
+    (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  $('themeBtn').textContent = isDark ? '☀️' : '🌙';
+}
+function toggleTheme(){
+  const current = document.documentElement.getAttribute('data-theme') ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('cc_theme', next);
+  applyThemeButton();
+  drawChart();
+}
+
+function toggleLang(){
+  LANG = LANG === 'fr' ? 'en' : 'fr';
+  localStorage.setItem('cc_lang', LANG);
+  renderStaticText();
+  render();
+  drawChart();
+}
+
+/* ---------------------------------------------------------
+   10) Wire up events
+--------------------------------------------------------- */
+$('fromPill').onclick = ()=> openPicker('from');
+$('toPill').onclick = ()=> openPicker('to');
+$('sheetOverlay').onclick = (e)=>{ if(e.target === $('sheetOverlay')) closePicker(); };
+$('searchInput').oninput = (e)=> renderCurrencyList(e.target.value);
+
+$('swapBtn').onclick = ()=>{
+  [state.from, state.to] = [state.to, state.from];
+  persist(); render(); loadRatesAndRender(); drawChart();
+};
+
+$('amountInput').oninput = (e)=>{
+  state.amount = parseFloat(e.target.value) || 0;
+  persist(); render();
+};
+
+$('precisionToggle').onclick = ()=>{
+  state.extraPrecision = !state.extraPrecision;
+  $('precisionToggle').textContent = state.extraPrecision ? t('fewerDecimals') : t('moreDecimals');
+  render();
+};
+
+$('refreshBtn').onclick = ()=> loadRatesAndRender(true);
+$('themeBtn').onclick = toggleTheme;
+$('langBtn').onclick = toggleLang;
+$('clearHistBtn').onclick = ()=>{
+  state.history = [];
+  localStorage.setItem('cc_history', '[]');
+  renderHistory();
+};
+
+$('periodRow').addEventListener('click', (e)=>{
+  const btn = e.target.closest('.period-btn');
+  if(!btn) return;
+  document.querySelectorAll('.period-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  state.chartPeriod = parseInt(btn.dataset.period, 10);
+  drawChart();
+});
+
+/* ---------------------------------------------------------
+   11) Init
+--------------------------------------------------------- */
+// Embedded PWA manifest via data URI (works when the file is hosted; on a
+// locally opened file the browser will simply ignore it, which is expected).
+const manifest = {
+  name: LANG === 'fr' ? "Kobo — Convertisseur de devises" : "Kobo — Currency Converter",
+  short_name: "Kobo",
+  start_url: ".",
+  display: "standalone",
+  background_color: "#0E7C66",
+  theme_color: "#0E7C66",
+  icons: [{
+    src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%230E7C66"/><text x="50" y="66" font-size="52" text-anchor="middle" fill="white" font-family="sans-serif">$</text></svg>'),
+    sizes: "100x100",
+    type: "image/svg+xml"
+  }]
+};
+$('manifest-link').href = "data:application/manifest+json," + encodeURIComponent(JSON.stringify(manifest));
+
+$('amountInput').value = state.amount;
+applyThemeButton();
+renderStaticText();
+render();
+loadRatesAndRender();
+drawChart();
+
+window.addEventListener('online', ()=> loadRatesAndRender(true));
+
+})();
+</script>
+</body>
+</html>
