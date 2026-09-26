@@ -4,7 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Convertisseur de devises</title>
-<link rel="manifest" id="manifest-link">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kobo">
 <meta name="theme-color" content="#0E7C66">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1217,22 +1222,14 @@ $('periodRow').addEventListener('click', (e)=>{
 /* ---------------------------------------------------------
    11) Init
 --------------------------------------------------------- */
-// Embedded PWA manifest via data URI (works when the file is hosted; on a
-// locally opened file the browser will simply ignore it, which is expected).
-const manifest = {
-  name: LANG === 'fr' ? "Kobo — Convertisseur de devises" : "Kobo — Currency Converter",
-  short_name: "Kobo",
-  start_url: ".",
-  display: "standalone",
-  background_color: "#0E7C66",
-  theme_color: "#0E7C66",
-  icons: [{
-    src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%230E7C66"/><text x="50" y="66" font-size="52" text-anchor="middle" fill="white" font-family="sans-serif">$</text></svg>'),
-    sizes: "100x100",
-    type: "image/svg+xml"
-  }]
-};
-$('manifest-link').href = "data:application/manifest+json," + encodeURIComponent(JSON.stringify(manifest));
+// Enregistre le service worker : c'est ce qui permet au navigateur de
+// proposer un vrai bouton "Installer l'application" et de garder la page
+// accessible hors ligne.
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 
 $('amountInput').value = state.amount;
 applyThemeButton();

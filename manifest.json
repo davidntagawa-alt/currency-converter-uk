@@ -1,0 +1,16 @@
+{
+  "name": "Kobo — Convertisseur de devises",
+  "short_name": "Kobo",
+  "description": "Taux de change en direct, plus de 150 devises, historique et mode hors ligne.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E7C66",
+  "theme_color": "#0E7C66",
+  "lang": "fr",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
